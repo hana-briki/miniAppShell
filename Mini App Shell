@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+function menuprincipal () {
+clear
+TIME=1
+echo " "
+echo $0
+echo " "
+echo "Choisir une option :
+        1 – Vérifier le Processeur
+2 – Vérifier le système Kernel
+3 – La version du système d’exploitation installé
+        4 – Vérifier la mémoire du PC
+5 – Vérifier le numéro de série
+6 – Vérifier l’adresse IP
+7 - Vérifier l'état de batterie
+8 - Afficher les applications installées
+0 - Quitter"
+echo " "
+echo -n "Option choisie: "
+read opcao
+case $opcao in
+1)
+function processeur() {
+CPU_INFO=`cat /proc/cpuinfo | grep -i "^model name" | cut -d ":" -f2 | sed -n '1p'`
+echo "CPU model: $CPU_INFO"
+sleep $TIME
+}
+processeur
+read -n 1 -p "<Enter> pour retourner au menu principal"
+menuprincipal 
+;;
+2)
+function kernel () {
+#RED HAT: cat /etc/redhat-release
+KERNEL_VERSION_UBUNTU=`uname -r`
+KERNEL_VERSION_CENTOS=`uname -r`
+if [ -f /etc/lsb-release ]
+then
+echo "kernel version: $KERNEL_VERSION_UBUNTU"
+else
+echo "kernel version: $KERNEL_VERSION_CENTOS"
+fi
+}
+kernel
+read -n 1 -p "<Enter> pour retourner au menu principal"
+menuprincipal
+;;
+
+3)
+function systeme () {
+VERSION=`cat /etc/os-release | grep -i ^PRETTY`
+if [ -f /etc/os-release ]
+then
+echo "La version du systéme: $VERSION"
+else
+echo "cette version n’est plus supportée"
+fi
+}
+systeme
+read -n 1 -p "<Enter> pour retourner au menu principal"
+menuprincipal
+;;
+4)
+function memoire() {
+MEMORY_FREE=`free -m  | grep ^Mem | tr -s ' ' | cut -d ' ' -f 4`
+MEMORY_USED=`free -m  | grep ^Mem | tr -s ' ' | cut -d ' ' -f 3`
+echo Vérifier la mémoire du PC..
+echo "Mémoire libre: $MEMORY_FREE , Mémoire utilisée: $MEMORY_USED"
+}
+memoire
+read -n 1 -p "<Enter> Pour retourner au menu principal"
+menuprincipal
+;;
+
+5)
+function num_serie() {
+SERIAL_NUMBER=`dmidecode -t 1 | grep -i serial`
+echo $SERIAL_NUMBER
+}
+num_serie
+read -n 1 -p "<Enter> Pour retourner au menu principal"
+menuprincipal
+;;
+
+6)
+function ip () {
+IP_SYSTEM=`hostname -I`
+echo Adresse IP: $IP_SYSTEM
+}
+ip
+read -n 1 -p "<Enter> Pour retourner au menu principal"
+menuprincipal ;;       
+7)
+function batterie()
+{
+ETAT_BATTERIE=`upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to\ full|percentage"`
+echo $ETAT_BATTERIE
+}
+batterie
+read -n 1 -p "<Enter> Pour retourner au menu principal"
+menuprincipal
+;;
+8)
+function liste_apps()
+{
+for app in /usr/share/applications/*.desktop ~/.local/share/applications/*.desktop; do app="${app##/*/}"; echo "${app::-8}";
+done
+
+}
+liste_apps
+read -n 1 -p "<Enter> Pour retourner au menu principal"
+menuprincipal
+;;
+0)
+      echo Quitter le systéme..
+              sleep $TIME
+      exit 0
+      ;;
+
+*)
+echo Option invalide, veuillez essayer encore une fois!
+;;
+esac
+}
+menuprincipal
+
